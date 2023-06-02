@@ -106,6 +106,12 @@ struct point
         long double c=cos(angle),s=sin(angle);
         return point(p.x+v.x*c-v.y*s,p.y+v.x*s+v.y*c);
     }
+    long double angle(point p){
+    	complex<long double> v1(x,y),v2(p.x,p.y);
+    	long double delta=arg(v2)-arg(v1);
+    	if(dblcmp(delta)>=0) return delta;
+    	else return delta+2*pi;
+    }
 };
 struct line
 {
@@ -315,10 +321,11 @@ struct circle
     }
     int relationseg(line v)
     {
-        long double dst=v.dispointtoseg(p);
-        if (dblcmp(dst-r)<0)return 2;
-        if (dblcmp(dst-r)==0)return 1;
-        return 0;
+        long double mindst=v.dispointtoseg(p);//distancia minima a segmento
+        long double maxdst=max(p.distance(v.a),p.distance(v.b));
+        if(dblcmp(r-mindst)==1 && dblcmp(maxdst-r)==1) return 2;//interseca
+        else if(dblcmp(r-mindst)>=0 && dblcmp(maxdst-r)<=0) return 1;//esta dentro
+        return 0;//esta fuera
     }
     int relationline(line v)
     {
@@ -500,50 +507,18 @@ int main(){
 	ios::sync_with_stdio(false);
 	cin.tie(0);
 	cout << setprecision(12) << fixed;
-	circle c1,c2;
-	c1.input();
-	c2.input();
-	vector<point> ts;
-	if(c1.r<c2.r){
-	    circle cdiff=c2;
-	    cdiff.r-=c1.r;
-	    line t1,t2;
-	    int n=cdiff.tangentline(c1.p,t1,t2);
-	    if(n==2){
-    	    ts.pb(c1.p.add(t1.b.sub(c2.p).trunc(c1.r)));
-    	    ts.pb(c1.p.add(t2.b.sub(c2.p).trunc(c1.r)));
-	    }else if(n==1){
-	        ts.pb(c1.p.add(t1.a.sub(c2.p).trunc(c1.r)));
-	    }
-	}else if(c1.r>c2.r){
-	    circle cdiff=c1;
-	    cdiff.r-=c2.r;
-	    line t1,t2;
-	    int n=cdiff.tangentline(c2.p,t1,t2);
-	    if(n==2){
-    	    ts.pb(c1.p.add(t1.b.sub(c1.p).trunc(c1.r)));
-    	    ts.pb(c1.p.add(t2.b.sub(c1.p).trunc(c1.r)));
-	    }else if(n==1){
-    	    ts.pb(c1.p.add(t1.a.sub(c1.p).trunc(c1.r)));
-	    }
-	}else{
-	    ts.pb(c1.p.add(c2.p.sub(c1.p).rotleft().trunc(c1.r)));
-	    ts.pb(c1.p.add(c2.p.sub(c1.p).rotright().trunc(c1.r)));
+	circle c;
+	c.p=point(0,0);
+	int n;
+	cin>>n>>c.r;
+	vector<point> p(n);
+	for(int i=0;i<n;i++) p[i].input();
+	long double area=0;
+	for(int i=0;i<n;i++){
+	    long double dir=p[i].det(p[(i+1)%n]);
+	    area+=dblcmp(dir)*c.areatriangle(p[i],p[(i+1)%n]);
 	}
-	circle csum=c1;
-	csum.r+=c2.r;
-	line t1,t2;
-	int n=csum.tangentline(c2.p,t1,t2);
-	if(n==2){
-	    ts.pb(c1.p.add(t1.b.sub(c1.p).trunc(c1.r)));
-	    ts.pb(c1.p.add(t2.b.sub(c1.p).trunc(c1.r)));
-	}else if(n==1){
-	    ts.pb(c1.p.add(t1.a.sub(c1.p).trunc(c1.r)));
-	}
-	sort(all(ts));
-	for(point pt:ts){
-	    pt.output();
-	}
+	cout<<abs(area)<<"\n";
 	return 0;
 	// you should actually read the stuff at the bottom
 }

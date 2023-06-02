@@ -401,11 +401,11 @@ struct circle
         p2=a.add(v.b.sub(v.a).trunc(d));
         return 2;
     }
-    //5 separación
-    //4 circuncisión
+    //5 disjuntos
+    //4 tangentes externos
     //3 se cruzan
-    //2 interviene
-    //1 contiene
+    //2 tangentes internos
+    //1 contienen
     int relationcircle(circle v)
     {
         long double d=p.distance(v.p);
@@ -503,47 +503,7 @@ int main(){
 	circle c1,c2;
 	c1.input();
 	c2.input();
-	vector<point> ts;
-	if(c1.r<c2.r){
-	    circle cdiff=c2;
-	    cdiff.r-=c1.r;
-	    line t1,t2;
-	    int n=cdiff.tangentline(c1.p,t1,t2);
-	    if(n==2){
-    	    ts.pb(c1.p.add(t1.b.sub(c2.p).trunc(c1.r)));
-    	    ts.pb(c1.p.add(t2.b.sub(c2.p).trunc(c1.r)));
-	    }else if(n==1){
-	        ts.pb(c1.p.add(t1.a.sub(c2.p).trunc(c1.r)));
-	    }
-	}else if(c1.r>c2.r){
-	    circle cdiff=c1;
-	    cdiff.r-=c2.r;
-	    line t1,t2;
-	    int n=cdiff.tangentline(c2.p,t1,t2);
-	    if(n==2){
-    	    ts.pb(c1.p.add(t1.b.sub(c1.p).trunc(c1.r)));
-    	    ts.pb(c1.p.add(t2.b.sub(c1.p).trunc(c1.r)));
-	    }else if(n==1){
-    	    ts.pb(c1.p.add(t1.a.sub(c1.p).trunc(c1.r)));
-	    }
-	}else{
-	    ts.pb(c1.p.add(c2.p.sub(c1.p).rotleft().trunc(c1.r)));
-	    ts.pb(c1.p.add(c2.p.sub(c1.p).rotright().trunc(c1.r)));
-	}
-	circle csum=c1;
-	csum.r+=c2.r;
-	line t1,t2;
-	int n=csum.tangentline(c2.p,t1,t2);
-	if(n==2){
-	    ts.pb(c1.p.add(t1.b.sub(c1.p).trunc(c1.r)));
-	    ts.pb(c1.p.add(t2.b.sub(c1.p).trunc(c1.r)));
-	}else if(n==1){
-	    ts.pb(c1.p.add(t1.a.sub(c1.p).trunc(c1.r)));
-	}
-	sort(all(ts));
-	for(point pt:ts){
-	    pt.output();
-	}
+	cout<<c1.areacircle(c2)<<"\n";
 	return 0;
 	// you should actually read the stuff at the bottom
 }
